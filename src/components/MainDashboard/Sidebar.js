@@ -1,5 +1,5 @@
 import React from "react";
-import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
+import { Navbar, Container } from "react-bootstrap";
 import Logo1 from "./img/image 2.png";
 import Logo2 from "./img/CoE logo 1.png";
 function Sidebar() {

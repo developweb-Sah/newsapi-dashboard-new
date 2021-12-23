@@ -1,5 +1,6 @@
-import React from "react";
-import { Table } from "react-bootstrap";
+import * as React from "react";
+import paginationFactory from "react-bootstrap-table2-paginator";
+import BootstrapTable from "react-bootstrap-table-next";
 import { useState, useEffect } from "react";
 
 function ReferenceTable() {
@@ -14,42 +15,32 @@ function ReferenceTable() {
       });
   }, []);
 
-  const listSentiment = [];
-  data.forEach((d) => {
-    if (!listSentiment.includes(d.sentiment)) {
-      listSentiment.push(d.sentiment);
-    }
-  });
-  console.log(listSentiment);
-
-  const listEntity = [];
-  data.forEach((d) => {
-    if (!listEntity.includes(d.entity)) {
-      listEntity.push(d.entity);
-    }
-  });
-  console.log(listEntity);
+  const columns = [
+    { dataField: "news_headline", text: "Headline" },
+    { dataField: "sentiment", text: "Sentiment" },
+    {
+      dataField: "entity[0]",
+      text: "entity",
+      formatter: (cell, row) => {
+        let data = "";
+        for (let item in row.entity[0]) {
+          data += `${item}: ${row.entity[0][item]},  `;
+        }
+        return " " + data;
+      },
+    },
+  ];
 
   return (
     <>
-      <Table responsive>
-        <thead>
-          <tr>
-            <th>Headlines</th>
-            <th>Sentiments</th>
-            <th>Entity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item) => (
-            <tr key={item._id}>
-              <td>{item.news_headline}</td>
-              <td>{item.sentiment}</td>
-              <td></td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <div>
+        <BootstrapTable
+          keyField="news_headline"
+          data={data}
+          columns={columns}
+          pagination={paginationFactory()}
+        />
+      </div>
     </>
   );
 }

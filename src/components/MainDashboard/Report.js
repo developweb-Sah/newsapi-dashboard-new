@@ -11,14 +11,12 @@ import {
   ChartCategoryAxisItem,
   ChartTitle,
   ChartLegend,
-  ChartCategoryAxisTitle,
 } from "@progress/kendo-react-charts";
 
 const Report = () => {
   const [data, setData] = useState([]);
-  const [charData, setChartData] = useState([]);
-  const [positive, setPositive] = useState([]);
-  const [negative, setNegative] = useState([]);
+  const [positive, setPositive] = useState(0);
+  const [negative, setNegative] = useState(0);
 
   const columns = [
     { title: "Year", field: "dictionary_token" },
@@ -53,30 +51,79 @@ const Report = () => {
   const partners = ["AWS", "Google", "IBM", "Microsoft"];
 
   const technology = ["AI", "Blockchain"];
-  const [firstSeries, secondSeries] = [[{ positive }], [{ negative }]];
-  console.log(positive, 123);
-  const categories = ["Q1", "Q2", "Q3", "Q4"];
 
+  // console.log(positive, 123);
+  const categories = [
+    "Jan",
+    "Feb",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "Aug",
+    "Sept",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const series = [
+    {
+      data: [
+        positive,
+        positive,
+        positive,
+        positive,
+        positive,
+        positive,
+        positive,
+        positive,
+        positive,
+        positive,
+        positive,
+        positive,
+      ],
+    },
+    {
+      data: [
+        negative,
+        negative,
+        negative,
+        negative,
+        negative,
+        negative,
+        negative,
+        negative,
+        negative,
+        negative,
+        negative,
+        negative,
+      ],
+    },
+  ];
   useEffect(() => {
     fetch("https://newerver.herokuapp.com/newslist")
       .then((response) => response.json())
       .then((response) => {
-        console.log(response);
+        // console.log(response);
         setData(response);
 
         let positiveData =
-          response?.data &&
-          !!response?.data.length &&
-          response?.data.filter((item) => item?.label === "POSITIVE");
+          response &&
+          !!response?.length &&
+          response.filter((item) => item?.sentiment === "POSITIVE");
 
         setPositive(positiveData?.length);
-        console.log(positiveData, 11);
+        console.log(positiveData.length, 11);
 
         let negativeData =
-          response?.data &&
-          !!response?.data.length &&
-          response?.data.filter((item) => item?.label === "NEGATIVE");
+          response &&
+          !!response?.length &&
+          response?.filter((item) => item?.sentiment === "NEGATIVE");
         setNegative(negativeData?.length);
+        console.log(negativeData.length, 12);
+
         const userData = [];
         const positiveList = [];
         positiveList.fill(0, 0, 11);
@@ -104,11 +151,12 @@ const Report = () => {
       listSentiment.push(d.sentiment);
     }
   });
+  // if(listSentiment)
   console.log(listSentiment);
 
   const listYear = [];
   data.forEach((d) => {
-    console.log(d.created_on.substring(0, 4));
+    // console.log(d.created_on.substring(0, 4));
     if (!listYear.includes(d.created_on.substring(0, 4))) {
       listYear.push(d.created_on.substring(0, 4));
     }
@@ -116,7 +164,7 @@ const Report = () => {
 
   const listMonth = [];
   data.forEach((d) => {
-    console.log(d.created_on.substring(0, 4));
+    // console.log(d.created_on.substring(0, 4));
     if (!listMonth.includes(d.created_on.substring(5, 6))) {
       listMonth.push(d.created_on.substring(5, 6));
     }
@@ -153,53 +201,28 @@ const Report = () => {
       <div className="row mb-3">
         <div className="col-12">
           <div className="k-card">
-            {/* <Chart
-              style={{
-                height: 350,
-              }}
-            >
+            <Chart>
               <ChartTitle text="Column Chart" />
               <ChartLegend position="top" orientation="horizontal" />
               <ChartCategoryAxis>
-                <ChartCategoryAxisItem categories={listMonth} startAngle={45} />
+                <ChartCategoryAxisItem
+                  categories={categories}
+                  startAngle={45}
+                />
               </ChartCategoryAxis>
               <ChartSeries>
-                <ChartSeriesItem
-                  key={data._id}
-                  type="bar"
-                  stack={true}
-                  // positive={positive}
-                  // negative={negative}
-                  data={negative}
-                />
-                <ChartSeriesItem
-                  key={data._id}
-                  type="bar"
-                  stack={true}
-                  // positive={positive}
-                  // negative={negative}
-                  data={positive}
-                />
-              </ChartSeries>
-            </Chart> */}
-
-            <Chart>
-              <ChartTitle text="Units sold" />
-              <ChartCategoryAxis>
-                <ChartCategoryAxisItem categories={categories}>
-                  <ChartCategoryAxisTitle text="Months" />
-                </ChartCategoryAxisItem>
-              </ChartCategoryAxis>
-              <ChartSeries>
-                <ChartSeriesItem
-                  type="bar"
-                  gap={2}
-                  spacing={0.25}
-                  data={firstSeries}
-                />
-                <ChartSeriesItem type="bar" data={secondSeries} />
-                {/* <ChartSeriesItem type="bar" data={thirdSeries} />
-                <ChartSeriesItem type="bar" data={fourthSeries} /> */}
+                {series.map((item, idx) => (
+                  <ChartSeriesItem
+                    key={idx}
+                    type="column"
+                    tooltip={{
+                      visible: true,
+                    }}
+                    stack={true}
+                    data={item.data}
+                    name={item.name}
+                  />
+                ))}
               </ChartSeries>
             </Chart>
           </div>
